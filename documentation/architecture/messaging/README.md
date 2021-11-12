@@ -1,86 +1,96 @@
 # Ockam messaging building blocks
 
+## Problem statement
 
-## Intro
+Ockam Routing provides a framework to send messages between Ockam Workers and allows workers to forward messages using onward routes and trace return routes.
 
-TODO: intro about messaging
-heterogenous networks,
-different delivery properties, 
-connecting endpoints
+However, since it's up to the workers and transports to forward messages, Routing protocol does not guarantee that messages sent will be delivered.
 
-End-to-end all the things!
-
-Building blocks for end-to-end communication:
-
-Routing and accessibility
-
-Establishing "ends"
-
-Pipe: unidirectional end-to-end with set properties
-
-Pipe behaviour end definitions
-
-Pipe examples
-
-Pipe combinations: wrapping and injecting
+Different transports have different delivery properties, routes may forward a message through multiple machines over the network which makes it hard to reason about delivery over complex routes.
 
 
+## Definitions and symbols
 
-Channel: bidirectional pipe
+Message:
+A piece of information which can be sent and received by Workers.
 
-Request-response communication
-Backtracing with guarantees
+Message names use lower case, usually starting with `m`, e.g. `m1`, `msg1`, `m_create`
 
-## Vocabulary and algebra
+Worker:
+A stateful system which can receive and send messages.
 
-Route definitions and operations
+Workers are named staring with uppercase letters, e.g. `worker A`, `worker Sender`, `worker C1`
 
-Route combination and destructuring
+Worker addresses use either worker names, shorter worker names or `<number>#<worker_name>` format
 
-Backtraceable routes
+Worker addresses use uppercase letters numbers
+For example:
+`A` is an address of `worker A`
+`0#B` is an address of `worker B` (with address type `0`)
+`S` is an address for `worker Sender`
 
-Delivery properties in relation to routes
+Workers can have multiple addresses:
+`C1` is an address for `worker C1`
+`C1'` is also an address for `worker C1`
 
-Local assumptions
+Format with address type, e.g `0#A`, `1#B` is used to distinguish
+transport addresses and local node addresses
 
-Routing and worker types, dynamic, static, session, metadata etc.
+More on local addresses in [Accessibility](./Accessibility.md#local_address)
 
+Route:
 
+A path that message can be sent to
 
+In Ockam Routing context messages workers and routes have a more specific definition.
+This guide is using wider notion of those for abstraction purposes.
 
-## Messaging properties
+E.g. UDP datagram is not implemented as Ockam Routing Message and return address in the datagram is not implemented as Ockam Route, but they can be called Message and Route.
 
-1. Accessibility
-1. Reliable delivery
-1. Ordering and deduplication
+Routes are used to send messages from one worker to another
 
-Requirements and limitations when implementing delivery with pipes and channels
+A route to `worker B` is written as `->B`, if `worker A` sends messages to this route,
+it can be written as `A->B`
 
-Combining different pipes using requirements and limitations
+Routes can be combined together, combination of `A->B` and `B->C` is written as `A->B ; B->C`
+`;` is a route combination operator
 
-## Implementing pipes, tips and tricks
+Routes are lists of addresses and can be written as such `[A, B, C]`
 
-Asymmetric (multi-address) workers
+We can use both `->` and list notation together, e.g. `[A] ; A->C`
 
-Session handshakes
+Routes without specific addresses are written with lowercase names starting with `r`, e.g `r1`, `r_onward`, `r_return`
 
+Delivery:
 
-## Tolerating errors
+A sequence of messages `m1,m2,m3...` send from `worker A` to route `A->B` and received by `worker B`
+Dlievery might have multiple dynamic **delivery properties**, usually statistically measured
 
-Supervision and restarts
+More on delivery properties in [Delivery properties](./Delivery.md)
 
-Recoverable sessions and monitoring workers
-
-Persistent storage with idempotent worker operations
-
-Wrapping and injecting pipes over unreliable routes
-
-
-Reliable discovery and static routes
-
-
-
+Delivery exists per route, if messages `m1,m3` are sent over route `A->B` and messages `m2,m4` sent over route `A'->B'`, those are two different deliveries.
+Because of that, we can use routes to identify deliveries, e.g. delivery `A->B`
 
 
+## Core techniques
+
+In order to deal with complexity of messaging, we use two main techniques:
+
+1. Pipelining:
+
+If we have a delivery `A->B` and delivery `B->C`, and we know the properties of those deliveries, (we know how the workers forwarding messages work)
+Then we can tell how a pipelined delivery `A->B;B->C` would behave.
+
+1. End-to-end coordination:
+
+If we know that a delivery from `A->C` has certain properties, we can extend logic of A and C to improve those properties.
+
+For example if we want to facilitate delivery between devices over cloud services, we would create a pipeline from one device through the cloud service and to the other device `D1->C;C->D2`
+
+Then we would set up end-to-end coordination between devices by adding some messaging logic **in the devices** to make sure delivery properties are respected end-to-end
+
+Special workers can be used to "wrap" unreliable delivery and provide reliable delivery over unreliable message pipelines
+
+Up next: [Delivery properties overview](Delivery.md)
 
 
