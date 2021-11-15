@@ -36,7 +36,7 @@ Workers can have multiple addresses:
 Format with address type, e.g `0#A`, `1#B` is used to distinguish
 transport addresses and local node addresses
 
-More on local addresses in [Accessibility](./Accessibility.md#local_address)
+More on local addresses in [Accessibility](./Accessibility.md#local_routes)
 
 Route:
 
@@ -60,6 +60,7 @@ Routes are lists of addresses and can be written as such `[A, B, C]`
 We can use both `->` and list notation together, e.g. `[A] ; A->C`
 
 Routes without specific addresses are written with lowercase names starting with `r`, e.g `r1`, `r_onward`, `r_return`
+
 
 Delivery:
 

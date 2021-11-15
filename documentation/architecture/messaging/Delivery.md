@@ -1,12 +1,6 @@
 # Delivery properties
 
 
-End-to-End
-
-
-
-
-1. Accessibiliy:
 
 Backtraceable routes
 
