@@ -73,25 +73,6 @@ Delivery exists per route, if messages `m1,m3` are sent over route `A->B` and me
 Because of that, we can use routes to identify deliveries, e.g. delivery `A->B`
 
 
-## Core techniques
-
-In order to deal with complexity of messaging, we use two main techniques:
-
-1. Pipelining:
-
-If we have a delivery `A->B` and delivery `B->C`, and we know the properties of those deliveries, (we know how the workers forwarding messages work)
-Then we can tell how a pipelined delivery `A->B;B->C` would behave.
-
-1. End-to-end coordination:
-
-If we know that a delivery from `A->C` has certain properties, we can extend logic of A and C to improve those properties.
-
-For example if we want to facilitate delivery between devices over cloud services, we would create a pipeline from one device through the cloud service and to the other device `D1->C;C->D2`
-
-Then we would set up end-to-end coordination between devices by adding some messaging logic **in the devices** to make sure delivery properties are respected end-to-end
-
-Special workers can be used to "wrap" unreliable delivery and provide reliable delivery over unreliable message pipelines
-
 Up next: [Delivery properties overview](Delivery.md)
 
 

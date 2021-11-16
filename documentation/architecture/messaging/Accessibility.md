@@ -175,5 +175,7 @@ More on that in [Pipes and channels](./Pipes_Channels.md)
 
 Metadata forwarders may trace routes, but it depends on the specific implementation.
 
+
 Back to: [Delivery properties](Delivery.md)
-Up next: [Ordering](Ordering.md)
+
+Up next: [Reliability](Reliability.md)
